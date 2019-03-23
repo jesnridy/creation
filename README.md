@@ -7,7 +7,9 @@ first of  all
 * [2 需要解决的点](#2)
 	* [2.1 多进程通信](#2.1)
 		* [2.1.1 gunicorn的解决方式](#2.1.1)
-		* [2.1.2 进程管理](#2.1.2)
+		* [2.1.2 进程管理方式](#2.1.2)
+		* [2.1.3 Python进程通信](#2.1.3)
+
 	* [2.2 epoll的调用实现](#2.2)
 	* [2.3 异步调用epoll](#2.3)
 
@@ -24,10 +26,17 @@ first of  all
 <h3 id="2.1">2.1 多进程通信</h3>
 <h4 id="2.1.1">2.1.1 gunicorn的解决方式</h4>
 <h4 id="2.1.2">2.1.2 进程管理</h4>
-考虑采用[nginx](https://blog.csdn.net/yusiguyuan/article/details/40924415)的方式，使用一个master进程，多个work子进程。
-
+>考虑采用[nginx](https://blog.csdn.net/yusiguyuan/article/details/40924415)的方式，使用一个master进程，多个worker子进程。
 master进程只做监控，重启服务，更换日志文件，reload配置文件。
-
 master通过信号机制掉用worker子进程进行和后端服务具体操作。
 
+-	master进程和worker进程需要做的交互
+	- 进程数据传输
+	- 通知时间（考虑single）
+	- 资源共享
+	- 进程控制（master进程需要控制worker进程，比如发生异常时master进程需要进行的操作）
+
+
+<h4 id="2.1.3">2.1.3 Python进程通信</h4>
+查看资料，总的比对在单机上进行进程通信，使用内存共享的方式比较合理。共享内存的方式比其他实现方式在于他实现逻辑简单，多进程间可以通过信号量或者互斥锁来完成。[Python进程通信资料](https://juejin.im/post/5b0abab451882538c220440b)
 
